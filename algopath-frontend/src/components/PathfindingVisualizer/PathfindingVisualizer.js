@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import Nav from '../../Nav.js'
+import Legend from '../Legend/Legend'
 import Node from '../Node/Node'
 import './PathfindingVisualizer.css'
 import { dijkstra, getNodesInShortestPathOrder } from '../../algorithms/dijkstra'
@@ -14,7 +16,8 @@ export default class PathfindingVisualizer extends Component {
         super()
         this.state = {
             grid: [],
-            mouseIsPressed: false
+            mouseIsPressed: false,
+            visSpeed: 10
         }
     }
 
@@ -51,18 +54,23 @@ export default class PathfindingVisualizer extends Component {
     }
 
     animateDijkstra = (visitedNodesInOrder, nodesInShortestPathOrder) => {
+        const { visSpeed } = this.state
         for (let i = 0; i <= visitedNodesInOrder.length; i++) {
             if (i === visitedNodesInOrder.length) {
                 setTimeout(() => {
                     this.animateShortestPath(nodesInShortestPathOrder)
-                }, 10 * i)
+                }, visSpeed * i)
                 return
             }
             setTimeout(() => {
                 const node = visitedNodesInOrder[i]
                 document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited'
-            }, 10 * i)
+            }, visSpeed * i)
         }
+    }
+
+    changeSpeed = (input) => {
+        this.setState({visSpeed: input})
     }
 
     animateShortestPath = (nodesInShortestPathOrder) => {
@@ -74,52 +82,73 @@ export default class PathfindingVisualizer extends Component {
         }
     }
 
+    clearBoard = () => {
+        const grid = getInitialGrid()
+        this.setState({ grid })
+    }
+
+    clearWalls = () => {
+        console.log("clear walls")
+    }
+
+    clearPath = () => {
+        console.log("clear path")
+    }
+
     render() {
 
         const { grid, mouseIsPressed } = this.state
 
         return (
-            <>
-                <button onClick={() => this.visualizeDijkstra()}>
-                    Visualize Dijkstra's Algorithm
-              </button>
-                <div className="grid">
-                    {grid.map((row, rowIdx) => {
-                        return (
-                            <div key={rowIdx}>
-                                {row.map((node, nodeIdx) => {
-                                    const { row, col, isFinish, isStart, isWall } = node;
-                                    return (
-                                        <Node
-                                            key={nodeIdx}
-                                            row={row}
-                                            col={col}
-                                            isWall={isWall}
-                                            isStart={isStart}
-                                            isFinish={isFinish}
-                                            mouseIsPressed={mouseIsPressed}
-                                            onMouseDown={(row, col) => this.handleMouseDown(row, col)}
-                                            onMouseEnter={(row, col) =>
-                                                this.handleMouseEnter(row, col)
-                                            }
-                                            onMouseUp={() => this.handleMouseUp()}>
-                                        </Node>
-                                    );
-                                })}
-                            </div>
-                        );
-                    })}
-                </div>
-            </>
+            <div>
+                <Nav 
+                visualize={this.visualizeDijkstra}
+                visSpeed={this.state.visSpeed}
+                changeSpeed={this.changeSpeed}
+                clearBoard={this.clearBoard}
+                clearWalls={this.clearWalls}
+                clearPath={this.clearPath}
+                 />
+                <>
+                    <div className="grid">
+                        {grid.map((row, rowIdx) => {
+                            return (
+                                <div key={rowIdx}>
+                                    {row.map((node, nodeIdx) => {
+                                        const { row, col, isFinish, isStart, isWall } = node;
+                                        return (
+                                            <Node
+                                                key={nodeIdx}
+                                                row={row}
+                                                col={col}
+                                                isWall={isWall}
+                                                isStart={isStart}
+                                                isFinish={isFinish}
+                                                mouseIsPressed={mouseIsPressed}
+                                                onMouseDown={(row, col) => this.handleMouseDown(row, col)}
+                                                onMouseEnter={(row, col) =>
+                                                    this.handleMouseEnter(row, col)
+                                                }
+                                                onMouseUp={() => this.handleMouseUp()}>
+                                            </Node>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </>
+                <Legend />
+            </div>
         );
     }
 }
 
 const getInitialGrid = () => {
     const grid = []
-    for (let row = 0; row < 20; row++) {
+    for (let row = 0; row < 30; row++) {
         const currentRow = []
-        for (let col = 0; col < 50; col++) {
+        for (let col = 0; col < 67; col++) {
             currentRow.push(createNode(col, row))
         }
         grid.push(currentRow)
