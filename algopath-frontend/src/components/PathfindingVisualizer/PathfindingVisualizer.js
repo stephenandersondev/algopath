@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Nav from '../../Nav.js'
+import NavBar from '../../Nav.js'
 import Legend from '../Legend/Legend'
 import Node from '../Node/Node'
 import './PathfindingVisualizer.css'
@@ -17,7 +17,17 @@ export default class PathfindingVisualizer extends Component {
         this.state = {
             grid: [],
             mouseIsPressed: false,
-            visSpeed: 10
+            visSpeed: 10,
+            isRunning: false,
+            isStartNode: false,
+            isFinishNode: false,
+            isWallNode: false,
+            currRow: 0,
+            currCol: 0,
+            START_NODE_ROW: 10,
+            START_NODE_COL: 15,
+            FINISH_NODE_ROW: 10,
+            FINISH_NODE_COL: 3,
         }
     }
 
@@ -26,25 +36,162 @@ export default class PathfindingVisualizer extends Component {
         this.setState({ grid })
     }
 
-    handleMouseDown = (row, col) => {
-        const newGrid = getNewGridWithWallToggled(this.state.grid, row, col)
-        this.setState({
-            grid: newGrid,
-            mouseIsPressed: true
-        })
+    // handleMouseDown = (row, col) => {
+    //     const newGrid = getNewGridWithWallToggled(this.state.grid, row, col)
+    //     this.setState({
+    //         grid: newGrid,
+    //         mouseIsPressed: true
+    //     })
+
+    // }
+
+    // handleMouseEnter = (row, col) => {
+    //     if (!this.state.mouseIsPressed) return
+    //     const newGrid = getNewGridWithWallToggled(this.state.grid, row, col)
+    //     this.setState({ grid: newGrid })
+    // }
+
+    // handleMouseUp = () => {
+    //     this.setState({ mouseIsPressed: false })
+    // }
+
+    handleMouseDown(row, col) {
+        if (!this.state.isRunning) {
+            if (this.isGridClear()) {
+                if (
+                    document.getElementById(`node-${row}-${col}`).className ===
+                    'node node-start'
+                ) {
+                    this.setState({
+                        mouseIsPressed: true,
+                        isStartNode: true,
+                        currRow: row,
+                        currCol: col,
+                    });
+                } else if (
+                    document.getElementById(`node-${row}-${col}`).className ===
+                    'node node-finish'
+                ) {
+                    this.setState({
+                        mouseIsPressed: true,
+                        isFinishNode: true,
+                        currRow: row,
+                        currCol: col,
+                    });
+                } else {
+                    const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
+                    this.setState({
+                        grid: newGrid,
+                        mouseIsPressed: true,
+                        isWallNode: true,
+                        currRow: row,
+                        currCol: col,
+                    });
+                }
+            } else {
+                this.clearBoard();
+            }
+        }
     }
 
-    handleMouseEnter = (row, col) => {
-        if (!this.state.mouseIsPressed) return
-        const newGrid = getNewGridWithWallToggled(this.state.grid, row, col)
-        this.setState({ grid: newGrid })
+    isGridClear() {
+        for (const row of this.state.grid) {
+            for (const node of row) {
+                const nodeClassName = document.getElementById(
+                    `node-${node.row}-${node.col}`,
+                ).className;
+                if (
+                    nodeClassName === 'node node-visited' ||
+                    nodeClassName === 'node node-shortest-path'
+                ) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
-    handleMouseUp = () => {
-        this.setState({ mouseIsPressed: false })
+    handleMouseEnter(row, col) {
+        if (!this.state.isRunning) {
+            if (this.state.mouseIsPressed) {
+                const nodeClassName = document.getElementById(`node-${row}-${col}`)
+                    .className;
+                if (this.state.isStartNode) {
+                    if (nodeClassName !== 'node node-wall') {
+                        const prevStartNode = this.state.grid[this.state.currRow][
+                            this.state.currCol
+                        ];
+                        prevStartNode.isStart = false;
+                        document.getElementById(
+                            `node-${this.state.currRow}-${this.state.currCol}`,
+                        ).className = 'node';
+
+                        this.setState({ currRow: row, currCol: col });
+                        const currStartNode = this.state.grid[row][col];
+                        currStartNode.isStart = true;
+                        document.getElementById(`node-${row}-${col}`).className =
+                            'node node-start';
+                    }
+                    this.setState({ START_NODE_ROW: row, START_NODE_COL: col });
+                } else if (this.state.isFinishNode) {
+                    if (nodeClassName !== 'node node-wall') {
+                        const prevFinishNode = this.state.grid[this.state.currRow][
+                            this.state.currCol
+                        ];
+                        prevFinishNode.isFinish = false;
+                        document.getElementById(
+                            `node-${this.state.currRow}-${this.state.currCol}`,
+                        ).className = 'node';
+
+                        this.setState({ currRow: row, currCol: col });
+                        const currFinishNode = this.state.grid[row][col];
+                        currFinishNode.isFinish = true;
+                        document.getElementById(`node-${row}-${col}`).className =
+                            'node node-finish';
+                    }
+                    this.setState({ FINISH_NODE_ROW: row, FINISH_NODE_COL: col });
+                } else if (this.state.isWallNode) {
+                    const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
+                    this.setState({ grid: newGrid });
+                }
+            }
+        }
+    }
+
+    handleMouseUp(row, col) {
+        if (!this.state.isRunning) {
+            this.setState({ mouseIsPressed: false });
+            if (this.state.isStartNode) {
+                const isStartNode = !this.state.isStartNode;
+                this.setState({ isStartNode, START_NODE_ROW: row, START_NODE_COL: col });
+            } else if (this.state.isFinishNode) {
+                const isFinishNode = !this.state.isFinishNode;
+                this.setState({
+                    isFinishNode,
+                    FINISH_NODE_ROW: row,
+                    FINISH_NODE_COL: col,
+                });
+            }
+            getInitialGrid();
+        }
+    }
+
+    handleMouseLeave() {
+        if (this.state.isStartNode) {
+            const isStartNode = !this.state.isStartNode;
+            this.setState({ isStartNode, mouseIsPressed: false });
+        } else if (this.state.isFinishNode) {
+            const isFinishNode = !this.state.isFinishNode;
+            this.setState({ isFinishNode, mouseIsPressed: false });
+        } else if (this.state.isWallNode) {
+            const isWallNode = !this.state.isWallNode;
+            this.setState({ isWallNode, mouseIsPressed: false });
+            getInitialGrid();
+        }
     }
 
     visualizeDijkstra = () => {
+        this.setState({ isRunning: true })
         const { grid } = this.state
         const startNode = grid[START_NODE_ROW][START_NODE_COL]
         const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL]
@@ -64,35 +211,92 @@ export default class PathfindingVisualizer extends Component {
             }
             setTimeout(() => {
                 const node = visitedNodesInOrder[i]
-                document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-visited'
+                const element = document.getElementById(`node-${node.row}-${node.col}`)
+                if (element.className !== 'node node-finish' && element.className !== 'node node-start') {
+                    element.className = 'node node-visited'
+                }
             }, visSpeed * i)
         }
     }
 
     changeSpeed = (input) => {
-        this.setState({visSpeed: input})
+        this.setState({ visSpeed: input })
     }
 
     animateShortestPath = (nodesInShortestPathOrder) => {
         for (let i = 0; i < nodesInShortestPathOrder.length; i++) {
             setTimeout(() => {
                 const node = nodesInShortestPathOrder[i]
-                document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-shortest-path'
+                const element = document.getElementById(`node-${node.row}-${node.col}`)
+                if (element.className !== 'node node-finish' && element.className !== 'node node-start') {
+                    element.className = 'node node-shortest-path'
+                }
             }, 50 * i)
         }
+        this.setState({ isRunning: false })
     }
 
     clearBoard = () => {
-        const grid = getInitialGrid()
-        this.setState({ grid })
+        const newGrid = this.state.grid.slice();
+        for (const row of newGrid) {
+            for (const node of row) {
+                let nodeClassName = document.getElementById(
+                    `node-${node.row}-${node.col}`,
+                ).className;
+                if (
+                    nodeClassName !== 'node node-start' &&
+                    nodeClassName !== 'node node-finish'
+                ) {
+                    document.getElementById(`node-${node.row}-${node.col}`).className =
+                        'node';
+                    node.isVisited = false;
+                    node.distance = Infinity;
+                }
+                if (nodeClassName === 'node node-finish') {
+                    node.isVisited = false;
+                    node.distance = Infinity;
+                    node.isFinish = true;
+                }
+                if (nodeClassName === 'node node-start') {
+                    node.isVisited = false;
+                    node.distance = Infinity;
+                    node.isStart = true;
+                    node.isWall = false;
+                }
+                if (nodeClassName === 'node node-wall') {
+                    node.isVisited = false;
+                    node.distance = Infinity;
+                    node.isWall = false;
+                }
+            }
+        }
+        this.setState({
+            grid: newGrid
+        })
     }
 
     clearWalls = () => {
-        console.log("clear walls")
+        const newGrid = this.state.grid.slice();
+        for (const row of newGrid) {
+            for (const node of row) {
+                let nodeClassName = document.getElementById(
+                    `node-${node.row}-${node.col}`,
+                ).className;
+                if (nodeClassName === 'node node-wall') {
+                    document.getElementById(`node-${node.row}-${node.col}`).className =
+                        'node';
+                    node.isWall = false;
+                }
+            }
+        }
+        this.setState({
+            grid: newGrid
+        })
     }
 
+
     clearPath = () => {
-        console.log("clear path")
+        Array.from(document.getElementsByClassName("node node-shortest-path")).forEach(node => node.className = 'node node-visited')
     }
 
     render() {
@@ -101,14 +305,15 @@ export default class PathfindingVisualizer extends Component {
 
         return (
             <div>
-                <Nav 
-                visualize={this.visualizeDijkstra}
-                visSpeed={this.state.visSpeed}
-                changeSpeed={this.changeSpeed}
-                clearBoard={this.clearBoard}
-                clearWalls={this.clearWalls}
-                clearPath={this.clearPath}
-                 />
+                <NavBar
+                    visualize={this.visualizeDijkstra}
+                    visSpeed={this.state.visSpeed}
+                    changeSpeed={this.changeSpeed}
+                    clearBoard={this.clearBoard}
+                    clearWalls={this.clearWalls}
+                    clearPath={this.clearPath}
+                    isRunning={this.state.isRunning}
+                />
                 <>
                     <div className="grid">
                         {grid.map((row, rowIdx) => {
