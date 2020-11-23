@@ -1,10 +1,12 @@
 import React from 'react'
 import './Legend.css'
 
-export default function Legend() {
+export default function Legend(props) {
+    const { legendClass, context } = props;
     return (
-        <div className="legend">
-            <h1>This is the Legend</h1>
-        </div>
+        <li className="legend-li">
+        <div className={legendClass + " legend"}></div>
+        {context}
+      </li>
     )
 }
