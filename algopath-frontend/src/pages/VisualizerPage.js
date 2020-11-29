@@ -1,10 +1,12 @@
 import React from 'react'
 import PathfindingVisualizer from '../components/PathfindingVisualizer/PathfindingVisualizer.js'
 
-export default function VisualizerPage() {
+export default function VisualizerPage(props) {
     return (
         <div>
-            <PathfindingVisualizer />
+            <PathfindingVisualizer
+            handleLogout={props.handleLogout}
+             />
         </div>
     )
 }

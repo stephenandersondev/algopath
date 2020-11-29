@@ -1,19 +1,22 @@
 import React from 'react'
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link } from 'react-router-dom'
 import { Nav, NavDropdown, Button } from 'react-bootstrap'
+import Logo from './img/algopath-logo.png'
 
 export default function NavBar(props) {
 
     const {
         visualize,
         visSpeed,
+        visAlgo,
+        changeAlgo,
         changeSpeed,
         clearBoard,
         clearWalls,
         clearPath,
-        isRunning
+        isRunning,
+        handleLogout
     } = props;
 
     const speedTerm =
@@ -24,28 +27,24 @@ export default function NavBar(props) {
 
     return (
         <Nav navbar fill className="navbar">
-            <h3>AlgoPath</h3>
+            <img src={Logo} height='25px' width="auto" />
             <NavDropdown disabled={isRunning} title={`Speed: ${speedTerm}`} id="nav-dropdown">
                 <NavDropdown.Item onClick={() => changeSpeed(30)}>Slow</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => changeSpeed(20)}>Medium</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => changeSpeed(10)}>Fast</NavDropdown.Item>
             </NavDropdown>
-            <Nav.Item>
-                <Nav.Link disabled={isRunning}>
-                    Algorithm
-          </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-                <Nav.Link disabled={isRunning}>
-                    Mazes
-          </Nav.Link>
-            </Nav.Item>
+             <NavDropdown disabled={isRunning} title={`Algo: ${visAlgo}`} id="nav-dropdown">
+                <NavDropdown.Item onClick={() => changeAlgo("Dijkstra")}>Dijkstra</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => changeAlgo("AStar")}>AStar</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => changeAlgo("BFS")}>BFS</NavDropdown.Item>
+                <NavDropdown.Item onClick={() => changeAlgo("DFS")}>DFS</NavDropdown.Item>
+            </NavDropdown>
             <Nav.Item>
                 <Nav.Link disabled={isRunning}>
                     History
           </Nav.Link>
             </Nav.Item>
-            <Button disabled={isRunning} onClick={() => visualize()}>Visualize</Button>
+            <Button disabled={isRunning} onClick={() => visualize(visAlgo)}>Visualize</Button>
             <Nav.Item>
                 <Nav.Link disabled={isRunning} onClick={() => clearBoard()}>
                     Clear Board
@@ -62,7 +61,9 @@ export default function NavBar(props) {
           </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-            <Link to="/login"><li>Logout</li></Link>
+                <Nav.Link disabled={isRunning} onClick={() => handleLogout()}>
+                    Logout
+          </Nav.Link>
             </Nav.Item>
         </Nav>
     )
