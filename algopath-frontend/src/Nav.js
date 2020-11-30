@@ -16,7 +16,9 @@ export default function NavBar(props) {
         clearWalls,
         clearPath,
         isRunning,
-        handleLogout
+        handleLogout,
+        lastTenVis,
+        visInstance
     } = props;
 
     const speedTerm =
@@ -39,11 +41,11 @@ export default function NavBar(props) {
                 <NavDropdown.Item onClick={() => changeAlgo("BFS")}>BFS</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => changeAlgo("DFS")}>DFS</NavDropdown.Item>
             </NavDropdown>
-            <Nav.Item>
-                <Nav.Link disabled={isRunning}>
-                    History
-          </Nav.Link>
-            </Nav.Item>
+            <NavDropdown disabled={isRunning || lastTenVis.length === 0} title="History" id="nav-dropdown">
+                {lastTenVis.map(vis => 
+                <NavDropdown.Item onClick={() => visInstance(vis)} >{vis.instance.created_at}</NavDropdown.Item>
+                    )}
+            </NavDropdown>
             <Button disabled={isRunning} onClick={() => visualize(visAlgo)}>Visualize</Button>
             <Nav.Item>
                 <Nav.Link disabled={isRunning} onClick={() => clearBoard()}>

@@ -34,7 +34,7 @@ export default class LoginPage extends Component {
         const current = isLogginActive ? "Sign Up" : "Login";
         return (
             <div>
-            <img className="login-logo" src={Logo} height='100px' width="auto" />
+            <h2 className="login-logo">AlgoPath</h2>
             <div className="login">
                 <div className="container" ref={ref => (this.container = ref)}>
                     {isLogginActive && (

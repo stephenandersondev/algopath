@@ -30,17 +30,27 @@ export default class PathfindingVisualizer extends Component {
             FINISH_NODE_COL: 44,
             ROW_COUNT: 40,
             COLUMN_COUNT: 67,
-            currentUserId: ''
+            currentUserId: '',
+            lastTenVis: []
         }
     }
 
 
     componentDidMount() {
         const grid = this.getInitialGrid()
-        this.setState({ 
-        grid: grid,
-        currentUserId: this.props.currentUserId
-     })
+        this.setState({
+            grid: grid,
+            currentUserId: this.props.currentUserId
+        })
+        this.getUserHistory()
+    }
+
+    getUserHistory = () => {
+        fetch(`http://localhost:3000/api/v1/users/${this.props.currentUserId}`)
+            .then(res => res.json())
+            .then(data => {
+                this.setState({ lastTenVis: data })
+            })
     }
 
     getInitialGrid = () => {
@@ -206,15 +216,80 @@ export default class PathfindingVisualizer extends Component {
         }
     }
 
-    // visualizeDijkstra = () => {
-    //     this.setState({ isRunning: true })
-    //     const { grid, START_NODE_ROW, START_NODE_COL, FINISH_NODE_ROW, FINISH_NODE_COL } = this.state
-    //     const startNode = grid[START_NODE_ROW][START_NODE_COL]
-    //     const finishNode = grid[FINISH_NODE_ROW][FINISH_NODE_COL]
-    //     const visitedNodesInOrder = dijkstra(grid, startNode, finishNode)
-    //     const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode)
-    //     this.animate(visitedNodesInOrder, nodesInShortestPathOrder)
-    // }
+    saveVisInstance = () => {
+        fetch('http://localhost:3000/api/v1/instances', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                start_node_col: this.state.START_NODE_COL,
+                start_node_row: this.state.START_NODE_ROW,
+                finish_node_col: this.state.FINISH_NODE_COL,
+                finish_node_row: this.state.FINISH_NODE_ROW,
+                user_id: this.state.currentUserId
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                this.saveWalls(data.id)
+            })
+    }
+
+    saveWalls = (id) => {
+        const walls = getCurrentWalls(this.state.grid)
+        const mappedWalls = walls.map(wall => { return [wall.col, wall.row, id] })
+        fetch('http://localhost:3000/api/v1/walls', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                walls: mappedWalls
+            })
+        })
+    }
+
+    visHistoryInstance = ({ instance, walls }) => {
+        this.clearBoard()
+        console.log(instance.start_node_col, instance.start_node_row)
+        const newGrid = this.state.grid.slice();
+        for (const row of newGrid) {
+            for (const node of row) {
+                if(node.row === this.state.START_NODE_ROW && node.col === this.state.START_NODE_COL) {
+                document.getElementById(`node-${node.row}-${node.col}`).className = 'node'
+                node.isStart = false
+                }
+                if(node.row === this.state.FINISH_NODE_ROW && node.col === this.state.FINISH_NODE_COL) {
+                document.getElementById(`node-${node.row}-${node.col}`).className = 'node'
+                node.isFinish = false
+                }
+            }
+        }
+        for (const row of newGrid) {
+            for (const node of row) {
+                if (node.row === instance.start_node_row && node.col === instance.start_node_col) {
+                    document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-start'
+                    node.isStart = true;
+                }
+                if (node.row === instance.finish_node_row && node.col === instance.finish_node_col) {
+                    document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-finish'
+                    node.isFinish = true;
+                }
+
+            }
+        }
+        this.setState({
+            grid: newGrid,
+            START_NODE_COL: instance.start_node_col,
+            START_NODE_ROW: instance.start_node_row,
+            FINISH_NODE_COL: instance.finish_node_col,
+            FINISH_NODE_ROW: instance.finish_node_row
+        })
+    }
+
 
     changeAlgo = (input) => {
         this.setState({ visAlgo: input })
@@ -222,34 +297,34 @@ export default class PathfindingVisualizer extends Component {
 
     visualize = (algo) => {
         if (!this.state.isRunning) {
-        //   this.clearBoard();
-          this.setState({ isRunning: true })
-          const {grid} = this.state;
-          const startNode =
-            grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
-          const finishNode =
-            grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
-          let visitedNodesInOrder;
-          switch (algo) {
-            case 'Dijkstra':
-              visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
-              break;
-            case 'AStar':
-              visitedNodesInOrder = aStar(grid, startNode, finishNode);
-              break;
-            case 'BFS':
-              visitedNodesInOrder = bfs(grid, startNode, finishNode);
-              break;
-            case 'DFS':
-              visitedNodesInOrder = dfs(grid, startNode, finishNode);
-              break;
-            default:
-              break;
-          }
-          const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-          this.animate(visitedNodesInOrder, nodesInShortestPathOrder);
+            this.saveVisInstance()
+            this.setState({ isRunning: true })
+            const { grid } = this.state;
+            const startNode =
+                grid[this.state.START_NODE_ROW][this.state.START_NODE_COL];
+            const finishNode =
+                grid[this.state.FINISH_NODE_ROW][this.state.FINISH_NODE_COL];
+            let visitedNodesInOrder;
+            switch (algo) {
+                case 'Dijkstra':
+                    visitedNodesInOrder = dijkstra(grid, startNode, finishNode);
+                    break;
+                case 'AStar':
+                    visitedNodesInOrder = aStar(grid, startNode, finishNode);
+                    break;
+                case 'BFS':
+                    visitedNodesInOrder = bfs(grid, startNode, finishNode);
+                    break;
+                case 'DFS':
+                    visitedNodesInOrder = dfs(grid, startNode, finishNode);
+                    break;
+                default:
+                    break;
+            }
+            const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+            this.animate(visitedNodesInOrder, nodesInShortestPathOrder);
         }
-      }
+    }
 
     animate = (visitedNodesInOrder, nodesInShortestPathOrder) => {
         const { visSpeed } = this.state
@@ -284,6 +359,7 @@ export default class PathfindingVisualizer extends Component {
                 }
             }, 50 * i)
         }
+        this.getUserHistory()
         this.setState({ isRunning: false })
     }
 
@@ -384,11 +460,10 @@ export default class PathfindingVisualizer extends Component {
     render() {
 
         const { grid } = this.state
-        
+
         return (
             <div>
                 <NavBar
-                    // visualize={this.visualizeDijkstra}
                     visualize={this.visualize}
                     visSpeed={this.state.visSpeed}
                     visAlgo={this.state.visAlgo}
@@ -399,6 +474,8 @@ export default class PathfindingVisualizer extends Component {
                     clearPath={this.clearPath}
                     isRunning={this.state.isRunning}
                     handleLogout={this.props.handleLogout}
+                    lastTenVis={this.state.lastTenVis}
+                    visInstance={this.visHistoryInstance}
                 />
                 <>
                     <div className="grid">
@@ -461,8 +538,20 @@ const getNodesInShortestPathOrder = (finishNode) => {
     const nodesInShortestPathOrder = [];
     let currentNode = finishNode;
     while (currentNode !== null) {
-      nodesInShortestPathOrder.unshift(currentNode);
-      currentNode = currentNode.previousNode;
+        nodesInShortestPathOrder.unshift(currentNode);
+        currentNode = currentNode.previousNode;
     }
     return nodesInShortestPathOrder;
-  }
+}
+
+const getCurrentWalls = (grid) => {
+    const wallsArray = []
+    for (const row of grid) {
+        for (const node of row) {
+            if (node.isWall === true) {
+                wallsArray.push(node)
+            }
+        }
+    }
+    return wallsArray
+}

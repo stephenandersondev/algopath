@@ -75,7 +75,6 @@ class App extends Component {
             displaySignupError: true
           })
         }
-        console.log(data)
       })
   }
 

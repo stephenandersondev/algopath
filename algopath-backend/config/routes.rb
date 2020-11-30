@@ -4,7 +4,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :walls
       resources :instances
-      resources :users
+      resources :users, only: [:show, :create]
       post '/login', to: 'auth#create'
       post '/signup', to: 'users#create'
     end
