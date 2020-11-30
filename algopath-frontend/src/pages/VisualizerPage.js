@@ -6,6 +6,7 @@ export default function VisualizerPage(props) {
         <div>
             <PathfindingVisualizer
             handleLogout={props.handleLogout}
+            currentUserId={props.currentUserId}
              />
         </div>
     )

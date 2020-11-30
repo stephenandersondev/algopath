@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  skip_before_action :authorized, only: [:create]
+  skip_before_action :authorized, only: [:create, :show]
 
   def create
     @user = User.new(username: params[:username], password: params[:password])
@@ -10,5 +10,11 @@ class Api::V1::UsersController < ApplicationController
     else
       render json: { error: "Failed to create user" }, status: :not_acceptable
     end
+  end
+
+  def show
+    user = User.find(params[:id])
+    results = user.last_ten
+    render json: results
   end
 end
