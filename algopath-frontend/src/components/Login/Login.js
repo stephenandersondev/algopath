@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import loginImg from '../../img/login.svg'
 
 export default function Login(props) {
-    const { handleChange, handleSubmit, username, password, error, displayLoginError } = props
+    const { handleChange, handleSubmit, error, displayLoginError } = props
     return (
         <div className="base-container" ref={props.containerRef}>
             <div className="header">Login</div>

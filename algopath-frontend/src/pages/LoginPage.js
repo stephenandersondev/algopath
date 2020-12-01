@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import './login.scss';
 import Login from '../components/Login/Login'
 import Signup from '../components/Login/Signup'
-import Logo from '../img/algopath-logo.png'
+import { Wave } from 'react-animated-text'
 
 export default class LoginPage extends Component {
 

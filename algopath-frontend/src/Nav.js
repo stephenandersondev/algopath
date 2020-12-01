@@ -2,7 +2,6 @@ import React from 'react'
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Nav, NavDropdown, Button } from 'react-bootstrap'
-import Logo from './img/algopath-logo.png'
 
 export default function NavBar(props) {
 
@@ -29,7 +28,7 @@ export default function NavBar(props) {
 
     return (
         <Nav navbar fill className="navbar">
-            <img src={Logo} height='25px' width="auto" />
+            <h2 className="nav-logo" >AlgoPath</h2>
             <NavDropdown disabled={isRunning} title={`Speed: ${speedTerm}`} id="nav-dropdown">
                 <NavDropdown.Item onClick={() => changeSpeed(30)}>Slow</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => changeSpeed(20)}>Medium</NavDropdown.Item>

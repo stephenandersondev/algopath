@@ -198,7 +198,6 @@ export default class PathfindingVisualizer extends Component {
                     FINISH_NODE_COL: col,
                 });
             }
-            this.getInitialGrid();
         }
     }
 
@@ -212,7 +211,6 @@ export default class PathfindingVisualizer extends Component {
         } else if (this.state.isWallNode) {
             const isWallNode = !this.state.isWallNode;
             this.setState({ isWallNode, mouseIsPressed: false });
-            this.getInitialGrid();
         }
     }
 
@@ -254,17 +252,16 @@ export default class PathfindingVisualizer extends Component {
 
     visHistoryInstance = ({ instance, walls }) => {
         this.clearBoard()
-        console.log(instance.start_node_col, instance.start_node_row)
         const newGrid = this.state.grid.slice();
         for (const row of newGrid) {
             for (const node of row) {
-                if(node.row === this.state.START_NODE_ROW && node.col === this.state.START_NODE_COL) {
-                document.getElementById(`node-${node.row}-${node.col}`).className = 'node'
-                node.isStart = false
+                if (node.row === this.state.START_NODE_ROW && node.col === this.state.START_NODE_COL) {
+                    document.getElementById(`node-${node.row}-${node.col}`).className = 'node'
+                    node.isStart = false
                 }
-                if(node.row === this.state.FINISH_NODE_ROW && node.col === this.state.FINISH_NODE_COL) {
-                document.getElementById(`node-${node.row}-${node.col}`).className = 'node'
-                node.isFinish = false
+                if (node.row === this.state.FINISH_NODE_ROW && node.col === this.state.FINISH_NODE_COL) {
+                    document.getElementById(`node-${node.row}-${node.col}`).className = 'node'
+                    node.isFinish = false
                 }
             }
         }
@@ -274,19 +271,29 @@ export default class PathfindingVisualizer extends Component {
                     document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-start'
                     node.isStart = true;
                 }
-                if (node.row === instance.finish_node_row && node.col === instance.finish_node_col) {
+                if (node.row === instance.end_node_row && node.col === instance.end_node_col) {
                     document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-finish'
                     node.isFinish = true;
                 }
-
+                
+            }
+        }
+        for (const row of newGrid) {
+            for (const node of row) {
+                for (const wall of walls) {
+                    if (node.row === wall.row && node.col === wall.col) {
+                        document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-wall'
+                        node.isWall = true;
+                    }
+                }
             }
         }
         this.setState({
             grid: newGrid,
             START_NODE_COL: instance.start_node_col,
             START_NODE_ROW: instance.start_node_row,
-            FINISH_NODE_COL: instance.finish_node_col,
-            FINISH_NODE_ROW: instance.finish_node_row
+            FINISH_NODE_COL: instance.end_node_col,
+            FINISH_NODE_ROW: instance.end_node_row
         })
     }
 
@@ -412,7 +419,6 @@ export default class PathfindingVisualizer extends Component {
             FINISH_NODE_ROW: ORIG_FINISH_NODE_ROW,
             FINISH_NODE_COL: ORIG_FINISH_NODE_COL
         })
-        this.getInitialGrid()
     }
 
     clearWalls = () => {
