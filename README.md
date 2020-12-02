@@ -1,12 +1,12 @@
 AlgoPath App 
 ========================
-![stellar-search](https://github.com/stephenandersondev/stellar-app/blob/master/stellar-frontend/src/assets/img/search-gif.gif?raw=true)
+![algopath-dijkstra](https://github.com/stephenandersondev/algopath-app/blob/master/algopath-frontend/src/img/algopath-dijkstra-gif.gif?raw=true)
 ## About
 
-Welcome to Stellar! This app was developed by Stephen Anderson (@stephenandersondev) and Ben Looper (@BenLooper) as part of week 12 of the Flatiron School Software Engineering program. It is an educational platform for students to research, create, and present space science projects. It utilizes a React frontend and a Ruby on Rails backend.
+Welcome to AlgoPath! This was developed by myself as a capstone project for the Flatiron School Software Engineering program. It is a data visualization tool for different types of pathfinding algorithms that utilizes a React frontend and a Ruby on Rails backend.
 
 ## Demo Video
-https://youtu.be/i7R7HOpHyKs
+https://youtu.be/sV5KLkQYRcw
 
 ## Installation
 
@@ -33,20 +33,16 @@ $ npm install
 $ npm start
 ```
 ## Usage
-You should now be brought to the login screen. Here you can create a new account, create a new project for you to use for your new account, or login with an existing account! 
+You will now be brought to the login screen. Here you can create a new account or login with an existing one! 
 
-![stellar-login](https://github.com/stephenandersondev/stellar-app/blob/master/stellar-frontend/src/assets/img/login-gif.gif?raw=true)
+![algopath-login](https://github.com/stephenandersondev/algopath-app/blob/master/algopath-frontend/src/img/algopath-login-gif.gif?raw=true)
 
-After logging in, you will be brought to the home screen where you can search and browse through NASA's library of resources. When you find one that interests you, click it, then you can view its details or even add some notes and assign it to your project.
+After logging in, you will be brought to the main screen where you will see the visualization grid. You can move the start and end nodes to new locations, add some walls, select an algorithm, and watch it find its way to the end node.
 
-![stellar-search](https://github.com/stephenandersondev/stellar-app/blob/master/stellar-frontend/src/assets/img/search-gif.gif?raw=true)
+![algopath-dijkstra](https://github.com/stephenandersondev/algopath-app/blob/master/algopath-frontend/src/img/algopath-dijkstra-gif.gif?raw=true)
 
-On the project screen, you can view all the resources that have been assigned to your project. Here you can edit, delete, or even re-order them to your liking.
+You also have the ability to change the speed of the visualization, and even call upon an old visualization with the history dropdown.
 
- ![stellar-project](https://github.com/stephenandersondev/stellar-app/blob/master/stellar-frontend/src/assets/img/project-gif.gif?raw=true)
+ ![algopath-dfs](https://github.com/stephenandersondev/algopath-app/blob/master/algopath-frontend/src/img/algopath-dfs-gif.gif?raw=true)
 
-Once you have everything to your liking, you can click the "Present Project" button to enter presentation mode and show off your project!
-
- ![stellar-present](https://github.com/stephenandersondev/stellar-app/blob/master/stellar-frontend/src/assets/img/present-gif.gif?raw=true)
-
-We hope you enjoy building learning about space in Stellar! 😊
+I hope you enjoy learning how pathfinding algorithms work in AlgoPath! 😊
