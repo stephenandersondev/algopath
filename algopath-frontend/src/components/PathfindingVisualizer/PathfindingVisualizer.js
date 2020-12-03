@@ -75,7 +75,10 @@ export default class PathfindingVisualizer extends Component {
             distance: Infinity,
             isVisited: false,
             isWall: false,
-            previousNode: null
+            previousNode: null,
+            distanceToFinishNode:
+                Math.abs(this.state.FINISH_NODE_ROW - row) +
+                Math.abs(this.state.FINISH_NODE_COL - col)
         }
     }
 
@@ -274,7 +277,7 @@ export default class PathfindingVisualizer extends Component {
                     document.getElementById(`node-${node.row}-${node.col}`).className = 'node node-finish'
                     node.isFinish = true;
                 }
-                
+
             }
         }
         for (const row of newGrid) {
@@ -327,6 +330,7 @@ export default class PathfindingVisualizer extends Component {
                 default:
                     break;
             }
+            console.log(visitedNodesInOrder)
             const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
             this.animate(visitedNodesInOrder, nodesInShortestPathOrder);
         }
@@ -388,17 +392,24 @@ export default class PathfindingVisualizer extends Component {
                         'node';
                     node.isVisited = false;
                     node.distance = Infinity;
+                    node.distanceToFinishNode =
+                        Math.abs(this.state.FINISH_NODE_ROW - node.row) +
+                        Math.abs(this.state.FINISH_NODE_COL - node.col);
                 }
                 if (nodeClassName === 'node node-finish') {
                     node.isVisited = false;
                     node.distance = Infinity;
                     node.isFinish = true;
+                    node.distanceToFinishNode = 0;
                 }
                 if (nodeClassName === 'node node-start') {
                     node.isVisited = false;
                     node.distance = Infinity;
                     node.isStart = true;
                     node.isWall = false;
+                    node.distanceToFinishNode =
+                        Math.abs(this.state.FINISH_NODE_ROW - node.row) +
+                        Math.abs(this.state.FINISH_NODE_COL - node.col);
                 }
                 if (nodeClassName === 'node node-wall') {
                     node.isVisited = false;
