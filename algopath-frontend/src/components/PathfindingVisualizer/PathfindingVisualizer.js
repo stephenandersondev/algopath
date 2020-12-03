@@ -330,7 +330,6 @@ export default class PathfindingVisualizer extends Component {
                 default:
                     break;
             }
-            console.log(visitedNodesInOrder)
             const nodesInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
             this.animate(visitedNodesInOrder, nodesInShortestPathOrder);
         }
