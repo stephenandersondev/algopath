@@ -3,7 +3,7 @@ AlgoPath App
 ![algopath-dijkstra](https://github.com/stephenandersondev/algopath-app/blob/master/algopath-frontend/src/img/algopath-dijkstra-gif.gif?raw=true)
 ## About
 
-Welcome to AlgoPath! This was developed by myself as a capstone project for the Flatiron School Software Engineering program. It is a data visualization tool for different types of pathfinding algorithms that utilizes a React frontend and a Ruby on Rails backend.
+This was developed by myself as a capstone project for the Flatiron School Software Engineering program. It is a data visualization tool for different types of pathfinding algorithms that utilizes a React frontend and a Rails backend.
 
 ## Demo Video
 https://youtu.be/sV5KLkQYRcw
