@@ -1,4 +1,4 @@
-AlgoPath App 
+AlgoPath
 ========================
 ![algopath-dijkstra](https://github.com/stephenandersondev/algopath-app/blob/master/algopath-frontend/src/img/algopath-dijkstra-gif.gif?raw=true)
 ## About
